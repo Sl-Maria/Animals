@@ -1,3 +1,5 @@
+import pickle
+
 class Animal():
     def __init__(self, name, age, color, a_type):
         self.name = name
@@ -63,6 +65,7 @@ class Zoo():
     def remove_animal(self, animal):
         self.animals.remove(animal)
     def display_animals(self):
+        print("Animals:")
         for animal in self.animals:
             print(animal.name, animal.age, animal.color, animal.a_type)
     def add_worker(self, type, name, age):
@@ -74,21 +77,53 @@ class Zoo():
     def remove_worker(self, worker):
         self.workers.remove(worker)
     def display_workers(self):
+        print("Workers:")
         for worker in self.workers:
             print(worker.name, worker.age, worker.occupation)
 
+    def save_to_file(self):
+        filename = 'zoo_files/' + self.name + '.pkl'
+        with open(filename, 'wb') as file:
+            pickle.dump({'animals': self.animals, 'workers': self.workers}, file)
+
+    def load_from_file(self, filename):
+        try:
+            with open(filename, 'rb') as file:
+                data = pickle.load(file)
+                self.animals = data['animals']
+                self.workers = data['workers']
+        except FileNotFoundError:
+            print(f"File {filename} not found. Starting with an empty Zoo.")
+
 
 def animal_sound(animals):
+    print("All animals sining at once:")
     for animal in animals:
         animal.make_sound()
 
 zoo = Zoo('Central Park')
-zoo.add_animal('bird', 'Tweety', 2, 'blue', 'crow')
-zoo.add_animal('mammal', 'Fluffy', 3, 'white', 'kangaroo')
-zoo.add_animal('reptile', 'Lion', 4, 'green', 'lion')
+zoo.load_from_file('zoo_files/' + zoo.name + '.pkl')
+# zoo.add_animal('bird', 'Tweety', 2, 'blue', 'crow')
+# zoo.add_animal('mammal', 'Fluffy', 3, 'white', 'kangaroo')
+# zoo.add_animal('reptile', 'Lion', 4, 'green', 'toad')
+# zoo.add_animal('reptile', 'Fred', 4, 'green', 'snake')
+# temp_animals = zoo.animals
+# for animal in temp_animals:
+#     if isinstance(animal, Reptile):
+#         print('removing', animal.name)
+#         zoo.remove_animal(animal)
+
 zoo.display_animals()
-zoo.add_worker('keeper', 'John', 35)
-zoo.add_worker('vet', 'Jane', 25)
+
+# zoo.add_worker('keeper', 'John', 35)
+# zoo.add_worker('vet', 'Jane', 25)
+# zoo.add_worker('keeper', 'Jack', 75)
+# zoo.add_worker('vet', 'Joy', 15)
+# for worker in zoo.workers:
+#     if worker.occupation == 'Vet':
+#         zoo.remove_worker(worker)
+
 zoo.display_workers()
 
 animal_sound(zoo.animals)
+zoo.save_to_file()
